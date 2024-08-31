@@ -85,9 +85,9 @@ function MobileNavMenu() {
     <div
       ref={navMenuRef}
       className="flex items-center gap-2 text-md text-[#f4f4f4] lg:hidden ">
-      <HoverCardHoc CardContent={DropdownCard}>
+      <MenuBarCardHoc CardContent={DropdownCard}>
         <img src={mapSvg} alt="maps svg" className="w-10 h-10"></img>
-      </HoverCardHoc>
+      </MenuBarCardHoc>
 
       <MenuBarCardHoc CardContent={CardContent}>
         <img src={hamburgerSvg} alt="maps svg" className="w-9 h-9 "></img>

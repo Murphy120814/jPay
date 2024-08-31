@@ -1,18 +1,40 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
+import gsap from "gsap";
+import rightImage from "../../../assets/general-hover.svg";
+import leftImage from "../../../assets/juspay-hover.svg";
 
-const HoverImages = ({ leftImage, rightImage }) => {
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const [isHovering, setIsHovering] = useState(false);
+const HoverImages = () => {
   const [windowWidth, setWindowWidth] = useState(
     typeof window !== "undefined" ? window.innerWidth : 0
   );
-
-  // Console log to check if props are received
-  console.log("Left Image:", leftImage);
-  console.log("Right Image:", rightImage);
+  const containerRef = useRef(null);
+  const leftImageRef = useRef(null);
+  const rightImageRef = useRef(null);
 
   const handleMouseMove = useCallback((e) => {
-    setMousePosition({ x: e.clientX, y: e.clientY });
+    if (
+      !containerRef.current ||
+      !leftImageRef.current ||
+      !rightImageRef.current
+    )
+      return;
+    const element = document.elementFromPoint(e.clientX, e.clientY);
+    const zIndex = element ? parseInt(getComputedStyle(element).zIndex, 10) : 0;
+    const isRightSide = e.clientX >= window.innerWidth / 2;
+
+    gsap.to([leftImageRef.current, rightImageRef.current], {
+      x: e.clientX,
+      y: e.clientY,
+      opacity: zIndex != 50 ? 0 : 1,
+      scale: zIndex != 50 ? 0.5 : 1,
+      duration: 0.3,
+      ease: "power2.out",
+    });
+
+    gsap.set(leftImageRef.current, { display: isRightSide ? "none" : "block" });
+    gsap.set(rightImageRef.current, {
+      display: isRightSide ? "block" : "none",
+    });
   }, []);
 
   const handleResize = useCallback(() => {
@@ -21,63 +43,43 @@ const HoverImages = ({ leftImage, rightImage }) => {
 
   useEffect(() => {
     if (typeof window !== "undefined" && windowWidth >= 1024) {
-      window.addEventListener("mousemove", handleMouseMove);
-      window.addEventListener("resize", handleResize);
-    }
+      const timer = setTimeout(() => {
+        window.addEventListener("mousemove", handleMouseMove);
+      }, 5000);
 
-    return () => {
-      if (typeof window !== "undefined") {
+      window.addEventListener("resize", handleResize);
+
+      return () => {
+        clearTimeout(timer);
         window.removeEventListener("mousemove", handleMouseMove);
         window.removeEventListener("resize", handleResize);
-      }
-    };
+      };
+    }
   }, [windowWidth, handleMouseMove, handleResize]);
 
-  const handleMouseEnter = () => setIsHovering(true);
-  const handleMouseLeave = () => setIsHovering(false);
-
-  if (windowWidth < 1024) {
-    return null;
-  }
+  if (windowWidth < 1024) return null;
 
   return (
-    <div
-      className="fixed inset-0 pointer-events-none z-0"
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}>
-      <div>
-        <div
-          className="absolute w-[200px] h-[200px] rounded-3xl transition-all duration-300 ease-out bg-red-200 "
-          style={{
-            left: `${mousePosition.x}px`,
-            top: `${mousePosition.y}px`,
-            opacity: mousePosition.x < windowWidth / 2 ? 1 : 0,
-            transform: `translate(-50%, -50%) scale(${
-              mousePosition.x < windowWidth / 2 ? 1 : 0.8
-            })`,
-          }}>
-          <img
-            src={leftImage}
-            alt="Right hover image"
-            className="w-full h-full object-contain"
-          />
-        </div>
-        <div
-          className="absolute w-[200px] h-[200px] rounded-3xl transition-all duration-300 ease-out bg-blue-200"
-          style={{
-            left: `${mousePosition.x}px`,
-            top: `${mousePosition.y}px`,
-            opacity: mousePosition.x >= windowWidth / 2 ? 1 : 0,
-            transform: `translate(-50%, -50%) scale(${
-              mousePosition.x >= windowWidth / 2 ? 1 : 0.8
-            })`,
-          }}>
-          <img
-            src={rightImage}
-            alt="Right hover image"
-            className="w-full h-full object-contain"
-          />
-        </div>
+    <div ref={containerRef} className="fixed inset-0 pointer-events-none z-0">
+      <div
+        ref={leftImageRef}
+        className="absolute w-[150px] h-[150px] rounded-3xl"
+        style={{ transform: "translate(-50%, -50%)", opacity: 0 }}>
+        <img
+          src={leftImage}
+          alt="Left hover image"
+          className="w-full h-full object-contain"
+        />
+      </div>
+      <div
+        ref={rightImageRef}
+        className="absolute w-[150px] h-[150px] rounded-3xl"
+        style={{ transform: "translate(-50%, -50%)", opacity: 0 }}>
+        <img
+          src={rightImage}
+          alt="Right hover image"
+          className="w-full h-full object-contain"
+        />
       </div>
     </div>
   );
