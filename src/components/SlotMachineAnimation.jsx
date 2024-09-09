@@ -13,8 +13,8 @@ const SlotMachineAnimation = ({ text, className, startAnimation }) => {
 
       letters.forEach((letter, index) => {
         const box = letter.querySelector(".box");
-        const chars = gsap.utils.shuffle(characters.split("")).slice(0, 3);
-        chars.push(text[index]);
+        // const chars = gsap.utils.shuffle(characters.split("")).slice(0, 3);
+        // chars.push(text[index]);
 
         gsap.set(box, { y: "0%" });
 

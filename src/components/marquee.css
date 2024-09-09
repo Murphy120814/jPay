@@ -1,0 +1,27 @@
+.marquee-container {
+    width: 100%;
+    overflow: hidden;
+    background-color: transparent;
+    padding: 20px 0;
+}
+
+.marquee-content {
+    display: flex;
+    gap: 30px;
+    animation: scroll 20s linear infinite;
+}
+
+@keyframes scroll {
+    0% {
+        transform: translateX(100%);
+    }
+
+    100% {
+        transform: translateX(-100%);
+    }
+}
+
+.brand-logo {
+    height: 50px;
+    width: auto;
+}
